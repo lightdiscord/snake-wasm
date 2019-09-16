@@ -57,8 +57,7 @@ fn main() -> Fallible<()> {
 
     let tick_loop = interval_buffered(100)
         .for_each(move |_| {
-            // TODO: Handle games end
-            game.write().unwrap().tick();
+            let _ = game.write().unwrap().tick();
             future::ready(())
         });
 

@@ -16,10 +16,16 @@ impl Draw for Snake {
         let grid_size = tile_size * game.size() as f64;
         let start_x = canvas.width() as f64 / 2.0 - grid_size / 2.0;
         let start_y = canvas.height() as f64 / 2.0 - grid_size / 2.0;
+        let color = if game.end() { ERROR_BACKGROUND } else { PRIMARY };
 
-        context.set_fill_style_color(PRIMARY);
+        context.set_fill_style_color(color);
         for coords in game.snake().body().iter() {
-            context.fill_rect(start_x + coords.x() as f64 * tile_size, start_y + coords.y() as f64 * tile_size, tile_size, tile_size);
+            context.fill_rect(
+                start_x + coords.x() as f64 * tile_size,
+                start_y + coords.y() as f64 * tile_size,
+                tile_size,
+                tile_size
+            );
         }
     }
 }
