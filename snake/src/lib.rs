@@ -4,13 +4,16 @@ use rand::prelude::*;
 use failure::{ Fail, Fallible };
 
 /// Coords(x, y)
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Coords(usize, usize);
 
 #[derive(Fail, Debug)]
-pub enum CoordsError {
+pub enum Error {
     #[fail(display = "invalid coordinates")]
-    InvalidCoordinates
+    InvalidCoordinates,
+
+    #[fail(display = "tried to eat himself")]
+    TriedToEatHimself
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -51,34 +54,23 @@ impl Coords {
     }
 
     fn try_add(&mut self, direction: Direction, limit: usize) -> Fallible<()> {
-        match direction {
-            Direction::Right => {
-                if self.0 == limit - 1{
-                    return Err(CoordsError::InvalidCoordinates)?;
-                }
+        Ok(match direction {
+            Direction::Right if self.0 != limit - 1 => {
                 self.0 += 1;
             },
-            Direction::Down => {
-                if self.1 == limit - 1{
-                    return Err(CoordsError::InvalidCoordinates)?;
-                }
+            Direction::Down if self.1 != limit - 1 => {
                 self.1 += 1;
             },
-            Direction::Left => {
-                if self.0 == 0 {
-                    return Err(CoordsError::InvalidCoordinates)?;
-                }
+            Direction::Left if self.0 != 0 => {
                 self.0 -= 1;
             },
-            Direction::Up => {
-                if self.1 == 0 {
-                    return Err(CoordsError::InvalidCoordinates)?;
-                }
+            Direction::Up if self.1 != 0 => {
                 self.1 -= 1;
             },
-        }
-
-        Ok(())
+            _ => {
+                return Err(Error::InvalidCoordinates)?;
+            }
+        })
     }
 }
 
@@ -116,13 +108,15 @@ impl Game {
         let size = 30;
         let mut rng = ThreadRng::default();
         let start = Coords::new_with_random(&mut rng, size);
-
-        Game {
+        let mut game = Game {
             size,
             snake: Snake::new(start),
-            goal: Coords::new_with_random(&mut rng, size),
+            goal: Coords(0, 0),
             rng
-        }
+        };
+
+        game.replace_goal();
+        return game;
     }
 
     pub fn tick(&mut self) -> Fallible<()> {
@@ -130,7 +124,12 @@ impl Game {
         front.try_add(self.snake.direction, self.size())?;
 
         self.snake.body.push_front(front);
-        self.snake.body.pop_back();
+
+        if self.goal == front {
+            self.replace_goal();
+        } else {
+            self.snake.body.pop_back();
+        }
 
         Ok(())
     }
@@ -154,6 +153,10 @@ impl Game {
         if !self.snake.direction.is_opposite(direction) {
             self.snake.direction = direction;
         }
+    }
+
+    fn replace_goal(&mut self) {
+        self.goal = Coords::new_with_random(&mut self.rng, self.size);
     }
 }
 
