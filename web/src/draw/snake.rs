@@ -21,8 +21,8 @@ impl Draw for Snake {
         context.set_fill_style_color(color);
         for coords in game.snake().body().iter() {
             context.fill_rect(
-                start_x + coords.x() as f64 * tile_size,
-                start_y + coords.y() as f64 * tile_size,
+                start_x + coords.x as f64 * tile_size,
+                start_y + coords.y as f64 * tile_size,
                 tile_size,
                 tile_size
             );

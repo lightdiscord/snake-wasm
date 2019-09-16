@@ -19,8 +19,8 @@ impl Draw for Goal {
 
         context.set_fill_style_color(GOAL);
         context.fill_rect(
-            start_x + game.goal().x() as f64 * tile_size,
-            start_y + game.goal().y() as f64 * tile_size,
+            start_x + game.goal().x as f64 * tile_size,
+            start_y + game.goal().y as f64 * tile_size,
             tile_size,
             tile_size
         );
