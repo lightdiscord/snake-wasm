@@ -20,7 +20,6 @@ use stdweb::web::html_element::CanvasElement;
 
 use std::sync::{ Arc, RwLock };
 
-
 pub trait Draw {
     type Context;
 
@@ -59,7 +58,7 @@ impl DrawLoop {
     
     fn draw(self) {
         self.context.draw(&());
-        window().request_animation_frame(|_| self.draw());
+        self.start();
     }
 
     pub fn start(self) {

@@ -1,3 +1,5 @@
+// TODO: Setup a way to switch between themes
+
 mod common {
     pub const GRID: &'static str = "#7f7f7f";
     pub const GOAL: &'static str = "#d50000";

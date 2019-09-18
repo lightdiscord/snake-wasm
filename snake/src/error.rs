@@ -8,6 +8,6 @@ pub enum Error {
     #[fail(display = "tried to eat himself")]
     TriedToEatHimself,
 
-    #[fail(display = "tried to tick but game end")]
-    TickAfterEnd
+    #[fail(display = "tried to tick in a no playable state")]
+    TickWhileNotPlaying
 }

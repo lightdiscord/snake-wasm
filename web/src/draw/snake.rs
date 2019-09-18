@@ -1,3 +1,5 @@
+use snake::game::State;
+
 use crate::themes::current::*;
 use super::{ Draw, DrawContext };
 
@@ -16,7 +18,7 @@ impl Draw for Snake {
         let grid_size = tile_size * game.size() as f64;
         let start_x = canvas.width() as f64 / 2.0 - grid_size / 2.0;
         let start_y = canvas.height() as f64 / 2.0 - grid_size / 2.0;
-        let color = if game.end() { ERROR_BACKGROUND } else { PRIMARY };
+        let color = if *game.state() != State::Playing { ERROR_BACKGROUND } else { PRIMARY };
 
         context.set_fill_style_color(color);
         for coords in game.snake().body().iter() {

@@ -21,10 +21,10 @@ use draw::{ DrawContext, DrawLoop };
 fn keydown_event(game: Arc<RwLock<Game>>) {
     window().add_event_listener(move |event: KeyDownEvent| {
         match event.key().as_str() {
-            "ArrowRight" => (game.write().unwrap().set_direction(Direction::Right)),
-            "ArrowLeft" => (game.write().unwrap().set_direction(Direction::Left)),
-            "ArrowUp" => (game.write().unwrap().set_direction(Direction::Up)),
-            "ArrowDown" => (game.write().unwrap().set_direction(Direction::Down)),
+            "ArrowRight" => (game.write().unwrap().snake.set_direction(Direction::Right)),
+            "ArrowLeft" => (game.write().unwrap().snake.set_direction(Direction::Left)),
+            "ArrowUp" => (game.write().unwrap().snake.set_direction(Direction::Up)),
+            "ArrowDown" => (game.write().unwrap().snake.set_direction(Direction::Down)),
             _ => ()
         }
     });

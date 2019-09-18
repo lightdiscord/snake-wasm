@@ -23,8 +23,8 @@ impl Coords {
         Coords::new(rng.gen_range(0, limit), rng.gen_range(0, limit))
     }
 
-    pub(crate) fn try_add(&mut self, direction: Direction, limit: usize) -> Fallible<()> {
-        Ok(match direction {
+    pub(crate) fn next(mut self, direction: Direction, limit: usize) -> Fallible<Coords> {
+        match direction {
             Direction::Right if self.x != limit - 1 => (self.x += 1),
             Direction::Down if self.y != limit - 1 => (self.y += 1),
             Direction::Left if self.x != 0 => (self.x -= 1),
@@ -32,7 +32,9 @@ impl Coords {
             _ => {
                 return Err(Error::InvalidCoordinates)?;
             }
-        })
+        }
+
+        Ok(self)
     }
 }
 

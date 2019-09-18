@@ -1,13 +1,19 @@
 use rand::prelude::*;
-use super::{ Snake, Coords, Error, Direction };
+use super::{ Snake, Coords, Error };
 use failure::Fallible;
 
+#[derive(PartialEq)]
+pub enum State {
+    Playing,
+    Dead
+}
+
 pub struct Game {
-    size: usize,
-    snake: Snake,
-    end: bool,
+    pub snake: Snake,
+    state: State,
+    rng: ThreadRng,
     goal: Coords,
-    rng: ThreadRng
+    size: usize
 }
 
 impl Game {
@@ -20,7 +26,7 @@ impl Game {
             size,
             snake: Snake::new(start),
             goal: Coords::new(0, 0),
-            end: false,
+            state: State::Playing,
             rng
         };
 
@@ -29,15 +35,15 @@ impl Game {
     }
 
     fn inner_tick(&mut self) -> Fallible<()> {
-        let mut front = *self.snake.body.front().unwrap();
-        front.try_add(self.snake.direction, self.size())?;
+        let size = self.size();
+        let mut front = *self.snake.body.front_mut().unwrap();
+        front = front.next(self.snake.direction, size)?;
 
-        if self.is_snake(front) {
+        if self.snake.is_snake(front) {
             return Err(Error::TriedToEatHimself)?;
         }
 
         self.snake.body.push_front(front);
-
         if self.goal == front {
             self.replace_goal();
         } else {
@@ -48,13 +54,13 @@ impl Game {
     }
 
     pub fn tick(&mut self) -> Fallible<()> {
-        if self.end {
-            return Err(Error::TickAfterEnd)?;
+        if self.state == State::Dead {
+            return Err(Error::TickWhileNotPlaying)?;
         }
 
         let result = self.inner_tick();
         if result.is_err() {
-            self.end = true;
+            self.state = State::Dead;
         }
 
         return result;
@@ -76,23 +82,13 @@ impl Game {
     }
 
     #[inline]
-    pub fn end(&self) -> bool {
-        self.end
-    }
-
-    pub fn set_direction(&mut self, direction: Direction) {
-        if !self.snake.direction.is_opposite(direction) {
-            self.snake.direction = direction;
-        }
-    }
-
-    fn is_snake(&self, coords: Coords) -> bool {
-        self.snake.body.iter().any(|&x| x == coords)
+    pub fn state(&self) -> &State {
+        &self.state
     }
 
     fn replace_goal(&mut self) {
         self.goal = Coords::new_with_random(&mut self.rng, self.size);
-        while self.is_snake(self.goal) {
+        while self.snake.is_snake(self.goal) {
             self.goal = Coords::new_with_random(&mut self.rng, self.size);
         }
     }
